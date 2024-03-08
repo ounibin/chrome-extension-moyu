@@ -1,0 +1,32 @@
+﻿{
+  "name": "摸鱼助手",
+  "description": "摸鱼助手，摸鱼助手",
+  "version": "0.1.0",
+  "manifest_version": 3,
+  "icons": {
+    "16": "assets/imgs/logo_32.png",
+    "128": "assets/imgs/logo_128.png"
+  },
+  "action": {
+    "default_popup": "action/index.html",
+    "default_icon": "assets/imgs/logo_128.png",
+    "default_title": "action here"
+  },
+  "options_page": "option/index.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.36kr.com/*",
+        "*://*.zhihu.com/*",
+        "*://*.jianshu.com/*",
+        "*://*.juejin.cn/*"
+      ],
+      "css": [],
+      "js": [
+        "content_scripts/inject.js"
+      ]
+    }
+  ],
+  "permissions": [],
+  "background": {}
+}
