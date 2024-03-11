@@ -1,62 +1,42 @@
 
 /**
- * 获取当前网站名称
- * 该函数没有参数。
- * @return {string} 返回当前网站的名称。如果无法识别网站，则返回'unknow'。
+ * 获取当前网站对应的CSS选择器列表。
+ * 该函数会根据当前窗口的地址判断网站域名，并从预设的网站域名与选择器映射中找到对应的选择器列表。
+ * 
+ * @returns {Array} 返回一个包含CSS选择器的数组。
  */
-function getCurrentSiteName() {
-  let name = 'unknow'; // 默认设置为未知网站
-  try {
-    const host = window.location.host; // 获取当前窗口的主机名和端口号
-
-    // 使用Map存储域名与网站名称的映射关系，提高查找效率和代码的可维护性
-    const siteMap = new Map([
-      [/zhihu.com/, 'zhihu'],
-      [/36kr.com/, '36kr'],
-      [/jianshu.com/, 'jianshu']
-    ]);
-
-    // 遍历Map以查找匹配的网站名称
-    for (const [regexp, siteName] of siteMap) {
-      if (regexp.test(host)) {
-        name = siteName;
-        break; // 找到匹配项即停止查找
-      }
+function getSelectorList() {
+  const host = window.location.host // 获取当前窗口的地址中的域名部分
+  let list = []
+  // 创建一个映射，将域名与对应的CSS选择器列表关联起来
+  const siteMap = new Map([
+    [/zhihu.com/, ['.QuestionHeader-title']],
+    [/36kr.com/, ['.kr-article h1.article-title', '.kr-mobile-article .body-title']],
+    [/jianshu.com/, ['h1._2zeTMs']]
+  ])
+  // 遍历映射，寻找与当前域名匹配的项
+  for (const [regexp, selectorList] of siteMap) {
+    if (regexp.test(host)) {
+      list = selectorList; // 将找到的匹配项的选择器列表赋值给list
+      break; // 找到匹配项即停止查找
     }
-  } catch (error) {
-    console.error("Error occurred while getting current site name:", error);
   }
-
-  return name; // 返回识别出的网站名称
+  return list
 }
 
 /**
  * 隐藏标题的函数
  */
 function hideTitle() {
-  const siteName = getCurrentSiteName()
-  let dom = null
-  let logo = null
-  switch (siteName) {
-    case 'zhihu':
-      dom = document.querySelector('.QuestionHeader-title')
-      break
-    case '36kr':
-      dom = document.querySelector('.kr-article h1.article-title') || document.querySelector('.kr-mobile-article .body-title')
-      logo = document.querySelector('.logo')
-      break
-    case 'jianshu':
-      dom = document.querySelector('h1._2zeTMs')
-  }
-
-  // 透明效果
-  if (dom && dom.style) {
-    dom.style.transition = 'all .5s'
-    dom.style.opacity = .02
-  }
-  if (logo?.style) {
-    logo.style.opacity = .02
-  }
+  const list = getSelectorList()
+  list.forEach((item) => {
+    dom = document.querySelector(item)
+    // 透明效果
+    if (dom && dom.style) {
+      dom.style.transition = 'all .5s'
+      dom.style.opacity = .02
+    }
+  })
 }
 
 /**
@@ -78,7 +58,6 @@ function switchDomHide(selector) {
 }
 
 function main() {
-  // 监听 action 的信息，做处理
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // console.log('action发来贺电: ', request)
     const { selector } = request
