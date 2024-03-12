@@ -11,7 +11,7 @@ function getSelectorList() {
   // 创建一个映射，将域名与对应的CSS选择器列表关联起来
   const siteMap = new Map([
     [/zhihu.com/, ['.QuestionHeader-title']],
-    [/36kr.com/, ['.kr-article h1.article-title', '.kr-mobile-article .body-title']],
+    [/36kr.com/, ['.main-left', '.kr-article h1.article-title', '.kr-mobile-article .body-title', '.article-right-container']],
     [/jianshu.com/, ['h1._2zeTMs']]
   ])
   // 遍历映射，寻找与当前域名匹配的项
@@ -34,7 +34,14 @@ function hideTitle() {
     // 透明效果
     if (dom && dom.style) {
       dom.style.transition = 'all .5s'
-      dom.style.opacity = .02
+      dom.style.opacity = .1
+
+      dom.addEventListener('mouseover', (e) => {
+        dom.style.opacity = 1
+      })
+      dom.addEventListener('mouseout', (e) => {
+        dom.style.opacity = .1
+      })
     }
   })
 }
@@ -44,17 +51,14 @@ function hideTitle() {
  * @param {string} selector CSS选择器，用于指定需要切换可见性的元素
  */
 function switchDomHide(selector) {
-  // 根据选择器查询DOM元素
   const targetDom = document.querySelector(selector)
-  // 如果未找到元素，则提示并返回
   if (!targetDom) {
     alert('没有找到该元素')
     return
   }
-  // 判断元素当前是否隐藏
-  const isHide = targetDom.style.visibility === 'hidden'
-  // 根据当前可见性状态切换元素的可见性
-  targetDom.style.visibility = isHide ? 'visible' : 'hidden'
+
+  const isHide = targetDom.style.opacity === 0
+  targetDom.style.opacity = isHide ? 1 : 0
 }
 
 function main() {
